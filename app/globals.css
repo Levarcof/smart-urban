@@ -1,1 +1,118 @@
 @import "tailwindcss";
+
+/* =========================
+   THEME VARIABLES
+========================= */
+@theme {
+  --color-background: #0a0a0b;
+  --color-foreground: #ffffff;
+  --color-card: #121214;
+  --color-accent: #6366f1;
+  --color-accent-secondary: #a855f7;
+
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+
+  --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================
+   BASE LAYER
+========================= */
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1 {
+    @apply text-3xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+}
+
+/* =========================
+   UTILITIES
+========================= */
+@layer utilities {
+  /* Glass Effects */
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-card {
+    @apply bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-3xl;
+    box-shadow: var(--shadow-premium);
+  }
+
+  /* Hover Glow */
+  .hover-glow {
+    @apply transition-all duration-300 hover:border-accent/40;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent to-accent-secondary;
+  }
+
+  /* Premium Button */
+  .premium-button {
+    @apply relative px-6 py-3 rounded-2xl font-semibold transition-all duration-300 
+           bg-gradient-to-r from-accent to-accent-secondary text-white 
+           hover:-translate-y-0.5 active:scale-95 overflow-hidden min-h-[44px];
+  }
+
+  .premium-button:hover {
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Safe Area Padding (Mobile App Feel) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Mobile Containers */
+  .mobile-container {
+    @apply px-4 sm:px-6 md:px-8;
+  }
+
+  .mobile-stack {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;
+  }
+}
+
+/* =========================
+   CUSTOM SCROLLBAR
+========================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}

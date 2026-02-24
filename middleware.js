@@ -1,22 +1,71 @@
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-export function middleware(req) {
+export async function middleware(req) {
   const token = req.cookies.get("token")?.value;
-  const url = req.nextUrl.pathname;
+  const { pathname } = req.nextUrl;
 
-  // if user NOT logged in & trying to access home
-  if (!token && !url.startsWith("/login") && !url.startsWith("/signup")) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  let role = null;
+
+  // 🔐 Verify Token
+  if (token) {
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      const { payload } = await jwtVerify(token, secret);
+      role = payload.role;
+    } catch (error) {
+      console.log("Invalid token");
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
-  // if user logged in & trying to access login/signup
-  if (token && (url.startsWith("/login") || url.startsWith("/signup"))) {
-    return NextResponse.redirect(new URL("/", req.url));
+  // ❌ If NOT logged in
+  if (!token) {
+    if (
+      !pathname.startsWith("/login") &&
+      !pathname.startsWith("/signup")
+    ) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    return NextResponse.next();
+  }
+
+  // ✅ If logged in as DEPARTMENT
+  if (role === "department") {
+    // Always redirect department to /department if trying to access home/login/signup
+    if (
+      pathname === "/" ||
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/signup")
+    ) {
+      return NextResponse.redirect(new URL("/department", req.url));
+    }
+  }
+
+  // ✅ If logged in as NORMAL USER
+  if (role === "user") {
+    // Block department route
+    if (pathname.startsWith("/department")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Prevent login/signup access
+    if (
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/signup")
+    ) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/login", "/signup"],
+  matcher: [
+    "/",
+    "/login",
+    "/signup",
+    "/department/:path*",
+  ],
 };

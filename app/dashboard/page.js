@@ -1,14 +1,13 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
-import { LayoutDashboard, Search, X, Trash2, Image as ImageIcon } from "lucide-react"
+import { LayoutDashboard, Search, Zap, Shield, X, Trash2, Image as ImageIcon, MapPin, Clock, User, CheckCircle, Plus, Filter, ArrowRight, Loader2 } from "lucide-react"
 
 export default function Page() {
   const [reports, setReports] = useState([])
   const [filter, setFilter] = useState("all")
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-  const [send , setSend] = useState(false)
   const [activeTab, setActiveTab] = useState("routes")
   const [previewImage, setPreviewImage] = useState(null)
 
@@ -28,19 +27,23 @@ export default function Page() {
   const getApiUrl = () => {
     if (activeTab === "routes") return "/api/report/all"
     if (activeTab === "garbage") return "/api/garbage/all"
-    // if (activeTab === "medical") return "/api/medical/all"
   }
 
   const getDeleteApi = () => {
     if (activeTab === "routes") return "/api/report/solve"
     if (activeTab === "garbage") return "/api/garbage/solve"
-    // if (activeTab === "medical") return "/api/medical/solve"
   }
 
   const fetchReports = async () => {
-    const res = await fetch(getApiUrl())
-    const data = await res.json()
-    setReports(data.reports || [])
+    setLoading(true)
+    try {
+      const res = await fetch(getApiUrl())
+      const data = await res.json()
+      setReports(data.reports || [])
+    } catch (err) {
+      console.error(err)
+    }
+    setLoading(false)
   }
 
   const fetchStats = async () => {
@@ -79,13 +82,11 @@ export default function Page() {
     return true
   })
 
-  // ✅ OPEN DELETE MODAL
   const openDeleteModal = (id) => {
     setDeleteId(id)
     setDeleteModal(true)
   }
 
-  // ✅ REAL DELETE LOGIC (same API)
   const resolveReport = async () => {
     if (!deleteId) return
     setLoading(true)
@@ -129,234 +130,281 @@ export default function Page() {
     <>
       <Navbar />
 
-      <div className="min-h-screen p-22 w-full text-white bg-[#020617]">
+      <div className="min-h-screen pt-6 md:pt-28 pb-24 md:pb-20 w-full bg-background font-sans">
+        {/* Background Atmosphere */}
+        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[100%] md:w-[50%] h-[50%] bg-accent/5 rounded-full blur-[80px] md:blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[100%] md:w-[50%] h-[50%] bg-accent-secondary/5 rounded-full blur-[80px] md:blur-[120px]" />
+        </div>
 
-        {/* TOP BAR */}
-        <div className="sticky top-0 z-40 bg-black/60 backdrop-blur-xl border-b border-white/10 px-3 sm:px-8 py-2 flex flex-col sm:flex-row gap-2 sm:justify-between sm:items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <LayoutDashboard size={20} className="text-green-400" />
+          {/* HEADER AREA */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div>
+              <div className="flex items-center gap-2 text-accent font-black uppercase tracking-[0.2em] text-[10px] md:text-xs mb-2 md:mb-3">
+                <LayoutDashboard size={14} /> Control Center
+              </div>
+              <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                City <span className="text-gradient">Dashboard</span>
+              </h1>
+            </div>
 
-            <div className="flex gap-1 bg-white/5 rounded-lg border border-white/10 px-1 py-1 overflow-x-auto">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+              <div className="relative group w-full sm:w-auto">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-accent transition-colors" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Query system files..."
+                  className="pl-12 pr-6 py-3 md:py-3.5 rounded-2xl bg-white/5 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all w-full md:w-[300px]"
+                />
+              </div>
+              <button
+                onClick={() => setShowAdminModal(true)}
+                className="premium-button flex items-center justify-center gap-2 group py-3 md:py-3.5 w-full sm:w-auto text-[10px] md:text-xs font-black uppercase tracking-widest"
+              >
+                <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                Elevate Authority
+              </button>
+            </div>
+          </div>
+
+          {/* TAB & FILTER BAR */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 mb-8 md:mb-10 glass p-2 rounded-2xl border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <div className="flex gap-1 p-1 bg-black/20 rounded-[14px] w-full md:w-auto">
               {[
-                { key: "routes", label: "Routes" },
-                { key: "garbage", label: "Garbage" },
-                // { key: "medical", label: "Medical" },
+                { key: "routes", label: "Neural Routes", icon: <MapPin size={16} /> },
+                { key: "garbage", label: "Civic Flux", icon: <Trash2 size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-3 py-1 text-xs rounded-md transition whitespace-nowrap ${
-                    activeTab === tab.key
-                      ? "bg-green-500 text-black"
-                      : "text-gray-300 hover:bg-white/10"
-                  }`}
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-black uppercase tracking-widest rounded-xl transition-all duration-500 ${activeTab === tab.key
+                    ? "bg-accent text-white shadow-lg shadow-accent/20"
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                    }`}
                 >
-                  {tab.label}
+                  {tab.icon} <span className="hidden xs:inline">{tab.label}</span> {tab.key === "routes" && <span className="xs:hidden">Routes</span>} {tab.key === "garbage" && <span className="xs:hidden">Flux</span>}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide py-1">
+              <div className="flex items-center gap-3 px-3 py-2 bg-white/5 rounded-xl border border-white/5 shrink-0">
+                <Filter size={14} className="text-zinc-500" />
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none">Filters</span>
+              </div>
+              {["all", "today", "month"].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${filter === f
+                    ? "bg-accent/10 border border-accent/30 text-accent"
+                    : "bg-white/5 border border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/10"
+                    }`}
+                >
+                  {f === "all" ? "Core Data" : f === "today" ? "Recent" : "Monthly"}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-[280px]">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search reports..."
-                className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs sm:text-sm focus:ring-2 focus:ring-green-500 outline-none"
-              />
-            </div>
-
-            <button
-              onClick={() => setShowAdminModal(true)}
-              className="px-3 py-1.5 text-xs sm:text-sm rounded-lg bg-green-500 text-black font-semibold whitespace-nowrap"
-            >
-              + Admin
-            </button>
+          {/* STATS GRID */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+            {[
+              { label: "Active Nodes", value: reports.length, icon: <Zap size={18} />, color: "text-accent" },
+              { label: "Total Synced", value: reports.length, icon: <CheckCircle size={18} />, color: "text-accent-secondary" },
+              { label: "Neural Users", value: stats.totalUsers, icon: <User size={18} />, color: "text-blue-400" },
+              { label: "Overseers", value: stats.totalAdmins, icon: <Shield size={18} />, color: "text-emerald-400" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="glass-card p-4 md:p-6 border-white/5 hover-glow group transition-all duration-500"
+              >
+                <div className={`p-2 md:p-2.5 rounded-xl bg-white/5 w-fit mb-3 md:mb-4 ${item.color} group-hover:scale-110 transition-transform duration-500`}>
+                  {item.icon}
+                </div>
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{item.label}</p>
+                <h2 className="text-xl md:text-3xl font-bold text-white mt-1.5 md:mt-2 tracking-tight group-hover:translate-x-1 transition-transform">
+                  {item.value}
+                </h2>
+              </div>
+            ))}
           </div>
-        </div>
 
-        {/* FILTER */}
-        <div className="flex gap-2 px-3 sm:px-8 mt-5 flex-wrap">
-          {["all", "today", "month"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
-                filter === f
-                  ? "bg-green-500 text-black shadow-lg"
-                  : "bg-white/5 text-gray-300 hover:bg-white/10"
-              }`}
-            >
-              {f === "all" ? "All Reports" : f === "today" ? "Today" : "Last 30 Days"}
-            </button>
-          ))}
-        </div>
-
-        {/* ✅ STATS (MOBILE 2 BOX PER ROW) */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-3 sm:px-8 py-5">
-          {[
-            { label: "Active Reports", value: reports.length },
-            { label: "Total Reports", value: reports.length },
-            { label: "Total Users", value: stats.totalUsers },
-            { label: "Admins", value: stats.totalAdmins },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="rounded-xl p-4 bg-black/70 border border-white/10 backdrop-blur-xl shadow-lg"
-            >
-              <p className="text-gray-400 text-xs">{item.label}</p>
-              <h2 className="text-2xl sm:text-3xl font-black text-green-400 mt-1">
-                {item.value}
-              </h2>
-            </div>
-          ))}
-        </div>
-
-        {/* DESKTOP TABLE */}
-        <div className="hidden md:block mx-3 sm:mx-8 mb-12 rounded-xl border border-white/10 bg-black/70 backdrop-blur-xl shadow-xl overflow-x-auto">
-          <table className="min-w-[800px] w-full text-sm">
-            <thead className="bg-white/5 text-gray-400">
-              <tr>
-                {activeTab === "garbage" && <th className="px-6 py-2 text-left">Image</th>}
-                <th className="px-6 py-2 text-left">Location</th>
-              {activeTab === "garbage" &&  <th className="px-6 py-2 text-left">Send to</th>}
-          
-
-              
-                <th className="px-6 py-2 text-left">Type</th>
-                <th className="px-6 py-2 text-left">Date</th>
-                <th className="px-6 py-2 text-left">User</th>
-                <th className="px-6 py-2 text-right">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredReports.map((r) => (
-                <tr key={r._id} className="border-t border-white/5 hover:bg-green-500/5 transition">
-                  {activeTab === "garbage" && (
-                    <td className="px-6 py-2">
-                      {r.images ? (
-                        <img
-                          src={r.images[0]}
-                          className="w-10 h-10 rounded-lg object-cover cursor-pointer"
-                          onClick={() => setPreviewImage(r.images[0])}
-                        />
-                      ) : (
-                        <ImageIcon size={16} className="text-gray-500" />
+          {/* MAIN TABLE AREA */}
+          <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+            <div className="hidden md:block glass-card border-white/5 overflow-hidden shadow-2xl">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-white/5 border-b border-white/5">
+                    {activeTab === "garbage" && <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Reference</th>}
+                    <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Location Vector</th>
+                    {activeTab === "garbage" && <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Assigned Node</th>}
+                    <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Protocol Details</th>
+                    <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Timestamp</th>
+                    <th className="px-8 py-5 text-left font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Originator</th>
+                    <th className="px-8 py-5 text-right font-black text-zinc-500 uppercase tracking-widest text-[9px] md:text-[10px]">Operations</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filteredReports.length > 0 ? filteredReports.map((r) => (
+                    <tr key={r._id} className="hover:bg-white/[0.02] transition-colors group">
+                      {activeTab === "garbage" && (
+                        <td className="px-8 py-5">
+                          {r.images ? (
+                            <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-white/10 group-hover:border-accent transition-colors cursor-pointer" onClick={() => setPreviewImage(r.images[0])}>
+                              <img src={r.images[0]} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Search size={14} className="text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-zinc-700">
+                              <ImageIcon size={20} />
+                            </div>
+                          )}
+                        </td>
                       )}
-                    </td>
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-2 text-zinc-300 font-bold">
+                          <MapPin size={14} className="text-accent" />
+                          {r.address}
+                        </div>
+                      </td>
+                      {activeTab === "garbage" && (
+                        <td className="px-8 py-5">
+                          <div className="px-3 py-1 rounded-full bg-accent-secondary/10 border border-accent-secondary/20 text-accent-secondary text-[10px] font-black w-fit uppercase tracking-wider">
+                            {r.departments?.[0]?.departmentName || "System Auto"}
+                          </div>
+                        </td>
+                      )}
+                      <td className="px-8 py-5 text-zinc-400 max-w-[200px] truncate italic">{r.message}</td>
+                      <td className="px-8 py-5 text-zinc-500 text-[10px] font-black uppercase tracking-wider tabular-nums">
+                        {new Date(r.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-8 py-5 text-white font-black tracking-widest text-xs uppercase">
+                        {r?.name || "System Core"}
+                      </td>
+                      <td className="px-8 py-5 text-right">
+                        <button
+                          onClick={() => openDeleteModal(r._id)}
+                          className="p-3 rounded-xl bg-white/5 text-zinc-500 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all active:scale-90 shadow-lg"
+                          title="Resolve Issue"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={7} className="px-8 py-20 text-center">
+                        <div className="flex flex-col items-center gap-4 opacity-10">
+                          <LayoutDashboard size={64} />
+                          <p className="text-xl font-black uppercase tracking-[0.3em]">No Active Vectors</p>
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                  <td className="px-6 py-2">{r.address}</td>
+                </tbody>
+              </table>
+            </div>
 
-                  {activeTab === "garbage" && r.departments && (
-                    <td className="px-6 py-2">
-                     {r.departments[0].departmentName}
-                    </td>
+            {/* MOBILE VIEW */}
+            <div className="md:hidden space-y-4">
+              {filteredReports.map((r) => (
+                <div key={r._id} className="glass-card border-white/5 p-5 animate-in fade-in slide-in-from-bottom-4 duration-500 active:scale-[0.98] transition-all">
+                  {activeTab === "garbage" && r.images && (
+                    <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-white/5 mb-5 shadow-inner" onClick={() => setPreviewImage(r.images[0])}>
+                      <img src={r.images[0]} className="w-full h-full object-cover" />
+                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-2 rounded-xl text-white border border-white/10">
+                        <ImageIcon size={18} />
+                      </div>
+                    </div>
                   )}
-                  <td className="px-6 py-2 text-gray-300">{r.message}</td>
-                  <td className="px-6 py-2 text-gray-500 text-xs">
-                    {new Date(r.createdAt).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-2 text-green-400 font-semibold">
-                    {r?.name || "Unknown"}
-                  </td>
-                  <td className="px-6 py-2 text-right">
+                  <div className="flex items-start gap-3 mb-4">
+                    <MapPin size={18} className="text-accent shrink-0 mt-0.5" />
+                    <p className="font-bold text-white text-base tracking-tight leading-snug">{r.address}</p>
+                  </div>
+                  {activeTab === "garbage" && r.departments && (
+                    <div className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 text-accent-secondary text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <Shield size={14} className="text-accent-secondary/60" /> Node: {r.departments[0].departmentName}
+                    </div>
+                  )}
+                  <p className="text-zinc-500 text-xs md:text-sm leading-relaxed mb-6 bg-black/20 p-4 rounded-xl border border-white/5 italic">"{r.message}"</p>
+                  <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-zinc-500 border border-white/5">
+                        <User size={16} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-white text-[11px] font-black uppercase tracking-wider">{r?.name || "Anonymous Operative"}</p>
+                        <p className="text-zinc-600 text-[9px] font-black tracking-widest tabular-nums uppercase">{new Date(r.createdAt).toLocaleString([], { hour12: false })}</p>
+                      </div>
+                    </div>
                     <button
                       onClick={() => openDeleteModal(r._id)}
-                      className="text-red-400 hover:text-red-600 transition"
+                      className="p-3.5 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 active:scale-90 transition-all shadow-lg"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={20} />
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* MOBILE CARDS */}
-        <div className="md:hidden px-3 pb-12 space-y-5">
-          {filteredReports.map((r) => (
-            <div key={r._id} className="rounded-2xl bg-black/80 border border-white/10 p-4 shadow-xl">
-
-              {activeTab === "garbage" && r.images && (
-                <img
-                  src={r.images[0]}
-                  className="w-full h-44 rounded-xl object-cover cursor-pointer mb-3"
-                  onClick={() => setPreviewImage(r.images[0])}
-                />
+              {filteredReports.length === 0 && (
+                <div className="glass-card p-12 text-center border-white/5 opacity-20">
+                  <div className="flex flex-col items-center gap-4">
+                    <LayoutDashboard size={48} />
+                    <p className="text-sm font-black uppercase tracking-widest">No Data Transmissions</p>
+                  </div>
+                </div>
               )}
-
-              <p className="text-sm font-medium">{r.address}</p>
-               {activeTab === "garbage" && r.departments && 
-                    <div className="rounded-2xl bg-black/80 border text-gray-300 border-white/10 py-1 shadow-sm">Send to :- {r.departments[0].departmentName}</div>
-                     
-                  }
-
-              <p className="text-xs text-gray-400 mt-1">{r.message}</p>
-
-              <div className="flex justify-between mt-3 text-xs">
-                <p className="text-green-400 font-semibold">{r?.name || "Unknown"}</p>
-                <p className="text-gray-500">{new Date(r.createdAt).toLocaleString()}</p>
-              </div>
-
-              <button
-                onClick={() => openDeleteModal(r._id)}
-                className="mt-3 w-full py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition"
-              >
-                Resolve & Delete
-              </button>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-   {/* IMAGE PREVIEW */}
-{previewImage && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center">
-      
-      {/* CLOSE BUTTON */}
-      <button
-        onClick={() => setPreviewImage(null)}
-        className="absolute top-2 right-2 bg-black/60 p-2 rounded-full hover:bg-red-500 transition z-50"
-      >
-        <X size={15} />
-      </button>
+      {/* IMAGE PREVIEW LIGHTBOX */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 md:p-12 transition-all animate-in fade-in duration-300">
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-6 right-6 p-3 rounded-full bg-black/60 text-white hover:bg-white/10 hover:rotate-90 transition-all duration-300 border border-white/10 z-[110]"
+          >
+            <X size={24} />
+          </button>
+          <div className="relative w-full max-w-5xl h-full flex items-center justify-center">
+            <img
+              src={previewImage}
+              className="max-w-full max-h-full object-contain rounded-2xl shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 p-1 bg-white/[0.02]"
+            />
+          </div>
+        </div>
+      )}
 
-      {/* FULL SIZE IMAGE */}
-      <img width={450} height={450}
-        src={previewImage}
-        className="max-w-full max-h-full rounded-xl border border-white/20 object-contain"
-      />
-    </div>
-  </div>
-)}
-
-
-      {/* ✅ DELETE CONFIRMATION MODAL */}
+      {/* DELETE MODAL */}
       {deleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-black/80 border border-white/10 rounded-xl p-5 w-[90%] max-w-xs shadow-xl text-center">
-            <h3 className="text-green-400 font-semibold text-lg">Problem Resolved?</h3>
-            <p className="text-gray-400 text-xs mt-2">
-              Are you sure you want to delete this report?
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+          <div className="glass-card border-white/10 p-8 md:p-10 w-full max-w-md shadow-2xl text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-red-500/50" />
+            <div className="w-20 h-20 md:w-20 md:h-20 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto mb-6 md:mb-8 animate-pulse">
+              <Trash2 size={36} />
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Finalize Protocol?</h3>
+            <p className="text-zinc-500 text-sm md:text-base mb-8 md:mb-10 leading-relaxed font-medium">
+              Permanent system erasure will occur for this transmission vector. Abort or Confirm?
             </p>
-
-            <div className="flex gap-2 mt-4">
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => setDeleteModal(false)}
-                className="flex-1 py-2 rounded-lg bg-white/10 text-sm text-white hover:bg-white/20"
+                className="py-4 rounded-2xl bg-white/5 text-zinc-300 font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-white/10 transition-all border border-white/5 active:scale-95"
               >
-                Cancel
+                Abort
               </button>
-
               <button
                 onClick={resolveReport}
-                className="flex-1 py-2 rounded-lg bg-green-500 text-black font-semibold text-sm hover:bg-green-400"
+                className="py-4 rounded-2xl bg-red-500 text-white font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-red-400 shadow-xl shadow-red-500/20 transition-all active:scale-95"
               >
                 Resolve
               </button>
@@ -364,34 +412,45 @@ export default function Page() {
           </div>
         </div>
       )}
-       {/* ADMIN MODAL */}
+
+      {/* ADMIN MODAL */}
       {showAdminModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="relative w-[90%] max-w-sm bg-black/80 border border-white/10 rounded-xl p-6 shadow-xl">
-            <button onClick={() => setShowAdminModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-white transition">
-              <X size={18} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+          <div className="glass-card border-white/10 p-8 md:p-10 w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-accent-secondary" />
+            <button onClick={() => setShowAdminModal(false)} className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-all scale-110 active:scale-90">
+              <X size={24} />
             </button>
-
-            <h2 className="text-lg font-bold text-green-400 mb-4">
-              Promote User to Admin
-            </h2>
-
-            <input
-              type="email"
-              placeholder="Enter user email"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-green-500 outline-none text-sm"
-            />
-
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => setShowAdminModal(false)} className="flex-1 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20">
-                Cancel
-              </button>
-
-              <button disabled={adminLoading} onClick={createAdmin} className="flex-1 py-2 rounded-lg bg-green-500 text-black font-semibold text-sm hover:bg-green-400">
-                {adminLoading ? "Processing..." : "Make Admin"}
-              </button>
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-6 md:mb-8">
+              <Shield size={32} />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Elevate Authority</h2>
+            <p className="text-zinc-500 text-sm md:text-base mb-6 md:mb-8 leading-relaxed font-medium">Grant administrative clearance to user by system identifier.</p>
+            <div className="space-y-4">
+              <div className="relative group">
+                <input
+                  type="email"
+                  placeholder="operator@nexus.com"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full pl-5 pr-5 py-4 rounded-2xl bg-white/5 border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all outline-none text-sm md:text-base font-bold"
+                />
+              </div>
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={() => setShowAdminModal(false)}
+                  className="flex-1 py-4 rounded-2xl glass font-black uppercase tracking-widest text-[10px] md:text-xs text-zinc-400 hover:text-white transition-all active:scale-95"
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={adminLoading}
+                  onClick={createAdmin}
+                  className="flex-1 py-4 rounded-2xl premium-button font-black uppercase tracking-widest text-[10px] md:text-xs text-white transition-all active:scale-95"
+                >
+                  {adminLoading ? "Processing..." : "Authorize"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

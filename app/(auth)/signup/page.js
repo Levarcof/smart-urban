@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Sparkles, Mail, Lock, User as UserIcon, Building, MapPin, Globe, Upload, ArrowRight, ShieldCheck } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
@@ -65,259 +66,289 @@ const Page = () => {
     const payload =
       type === "user"
         ? {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            image: imageUrl,
-          }
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          image: imageUrl,
+        }
         : {
-            departmentName: formData.departmentName,
-            email: formData.email,
-            password: formData.password,
-            address: formData.address,
-            location: {
-              lat: Number(formData.lat),
-              lng: Number(formData.lng),
-            },
-            image: imageUrl,
-          };
+          departmentName: formData.departmentName,
+          email: formData.email,
+          password: formData.password,
+          address: formData.address,
+          location: {
+            lat: Number(formData.lat),
+            lng: Number(formData.lng),
+          },
+          image: imageUrl,
+        };
 
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      alert("✅ Account created successfully!");
-      router.push("/login");
-    } else {
-      alert(data.message || "❌ Something went wrong");
+      if (res.ok) {
+        alert("✅ Account created successfully!");
+        router.push("/login");
+      } else {
+        alert(data.message || "❌ Something went wrong");
+      }
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050505] relative overflow-hidden py-12 px-4">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-900/20 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-green-600/10 rounded-full blur-[120px]" />
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-8 md:py-12 px-0 md:px-4">
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[80%] md:w-[50%] h-[50%] bg-accent/10 rounded-full blur-[80px] md:blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[80%] md:w-[50%] h-[50%] bg-accent-secondary/5 rounded-full blur-[80px] md:blur-[120px]" />
 
-      <div className="relative w-full max-w-xl bg-[#0f0f0f]/80 backdrop-blur-2xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl p-8 lg:p-12 animate-in fade-in zoom-in duration-500">
-        
+      <div className="relative w-full max-w-2xl glass-card p-6 md:p-10 lg:p-14 animate-in fade-in zoom-in duration-700 rounded-none md:rounded-[2.5rem] border-none md:border border-white/5">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent to-accent-secondary" />
+
         {/* Header Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
+        <div className="text-center mb-8 md:mb-10">
+          <div className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-accent/10 text-accent mb-4 md:mb-6 shadow-xl">
+            <Sparkles size={28} className="md:w-8 md:h-8" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 md:mb-3 tracking-tight">
             Create Account
           </h1>
-          <p className="text-zinc-400 font-medium">
-            Join the Smart Civic ecosystem today.
+          <p className="text-zinc-500 font-medium text-base md:text-lg">
+            Join the SmartCivic ecosystem today.
           </p>
         </div>
 
-        {/* Modern Segmented Toggle */}
-        <div className="flex bg-zinc-800/50 border border-white/5 rounded-2xl p-1.5 mb-8">
+        {/* SWITCHER */}
+        <div className="flex glass p-1 rounded-2xl mb-8 md:mb-10 shadow-inner">
           <button
             onClick={() => setType("user")}
-            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-              type === "user"
-                ? "bg-green-500 text-black shadow-[0_4px_12px_rgba(34,197,94,0.3)]"
-                : "text-zinc-400 hover:text-white"
-            }`}
+            className={`flex-1 py-3 md:py-3.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-500 flex items-center justify-center gap-2 ${type === "user"
+              ? "bg-accent text-white shadow-lg shadow-accent/20"
+              : "text-zinc-500 hover:text-zinc-300"
+              }`}
           >
-            👤 User
+            <UserIcon size={16} className="md:w-[18px]" /> Citizen
           </button>
           <button
             onClick={() => setType("department")}
-            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-              type === "department"
-                ? "bg-green-500 text-black shadow-[0_4px_12px_rgba(34,197,94,0.3)]"
-                : "text-zinc-400 hover:text-white"
-            }`}
+            className={`flex-1 py-3 md:py-3.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-500 flex items-center justify-center gap-2 ${type === "department"
+              ? "bg-accent text-white shadow-lg shadow-accent/20"
+              : "text-zinc-500 hover:text-zinc-300"
+              }`}
           >
-            🏢 Department
+            <Building size={16} className="md:w-[18px]" /> Dept
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           {/* USER FIELDS */}
           {type === "user" && (
-            <div className="space-y-4 animate-in slide-in-from-bottom-2 duration-300">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Full Name</label>
-                <input
-                  onChange={handleChange}
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  placeholder="John Doe"
-                  className="pro-input"
-                  required
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="space-y-2">
+                <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Full Name</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                    <UserIcon size={18} />
+                  </div>
+                  <input
+                    onChange={handleChange}
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    placeholder="John Doe"
+                    className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                    required
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Email Address</label>
-                <input
-                  onChange={handleChange}
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  placeholder="name@example.com"
-                  className="pro-input"
-                  required
-                />
+              <div className="space-y-2">
+                <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Email Address</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    onChange={handleChange}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    placeholder="name@nexus.com"
+                    className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                    required
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {/* DEPARTMENT FIELDS */}
           {type === "department" && (
-            <div className="space-y-4 animate-in slide-in-from-bottom-2 duration-300">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Department Name</label>
-                <input
-                  onChange={handleChange}
-                  type="text"
-                  name="departmentName"
-                  value={formData.departmentName}
-                  placeholder="Sanitation Dept."
-                  className="pro-input"
-                  required
-                />
+            <div className="space-y-5 md:space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Entity Designation</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                      <Building size={18} />
+                    </div>
+                    <input
+                      onChange={handleChange}
+                      type="text"
+                      name="departmentName"
+                      value={formData.departmentName}
+                      placeholder="Sanitation Dept."
+                      className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Official Uplink</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                      <Mail size={18} />
+                    </div>
+                    <input
+                      onChange={handleChange}
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      placeholder="dept@city.gov"
+                      className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Official Email</label>
-                <input
-                  onChange={handleChange}
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  placeholder="dept@city.gov"
-                  className="pro-input"
-                  required
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Office Address</label>
-                <input
-                  onChange={handleChange}
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  placeholder="123 Civic Plaza"
-                  className="pro-input"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Latitude</label>
+
+              <div className="space-y-2">
+                <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Physical Coordinates</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                    <MapPin size={18} />
+                  </div>
                   <input
                     onChange={handleChange}
                     type="text"
-                    name="lat"
-                    value={formData.lat}
-                    placeholder="0.0000"
-                    className="pro-input"
+                    name="address"
+                    value={formData.address}
+                    placeholder="123 Civic Plaza"
+                    className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Longitude</label>
-                  <input
-                    onChange={handleChange}
-                    type="text"
-                    name="lng"
-                    value={formData.lng}
-                    placeholder="0.0000"
-                    className="pro-input"
-                    required
-                  />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Latitude</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                      <Globe size={18} />
+                    </div>
+                    <input
+                      onChange={handleChange}
+                      type="text"
+                      name="lat"
+                      value={formData.lat}
+                      placeholder="0.0000"
+                      className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Longitude</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                      <Globe size={18} />
+                    </div>
+                    <input
+                      onChange={handleChange}
+                      type="text"
+                      name="lng"
+                      value={formData.lng}
+                      placeholder="0.0000"
+                      className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* SHARED FIELDS */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Security Password</label>
-            <input
-              onChange={handleChange}
-              type="password"
-              name="password"
-              value={formData.password}
-              placeholder="••••••••"
-              className="pro-input"
-              required
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Access Protocol</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                  <Lock size={18} />
+                </div>
+                <input
+                  onChange={handleChange}
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  placeholder="••••••••"
+                  className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                  required
+                />
+              </div>
+            </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Profile / Logo Image</label>
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="pro-input file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-500 file:text-black hover:file:bg-green-400 cursor-pointer"
-              />
+            <div className="space-y-2">
+              <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Avatar Uplink</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 group-focus-within:text-accent">
+                  <Upload size={18} />
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white file:hidden cursor-pointer focus:outline-none focus:border-accent/40 transition-all duration-300 text-sm md:text-base"
+                />
+                {!file && <span className="absolute left-14 top-1/2 -translate-y-1/2 text-zinc-700 pointer-events-none text-sm font-medium">Capture or Load...</span>}
+                {file && <span className="absolute left-14 top-1/2 -translate-y-1/2 text-white truncate max-w-[120px] md:max-w-[150px] font-bold text-sm">{file.name}</span>}
+              </div>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={uploading}
-            className={`w-full py-4 mt-4 rounded-2xl font-black uppercase tracking-wider transition-all duration-300 transform active:scale-95 shadow-[0_10px_20px_rgba(34,197,94,0.2)] ${
-              uploading 
-                ? "bg-zinc-700 text-zinc-400 cursor-not-allowed" 
-                : "bg-green-500 hover:bg-green-400 text-black hover:translate-y-[-2px]"
-            }`}
+            className={`w-full py-5 rounded-2xl font-black tracking-[0.1em] uppercase flex items-center justify-center gap-3 mt-4 active:scale-95 transition-all shadow-xl ${uploading
+              ? "bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-50"
+              : "premium-button"
+              }`}
           >
             {uploading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Processing...
+              <span className="flex items-center justify-center gap-3">
+                <svg className="animate-spin h-5 w-5 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Syncing Identity...
               </span>
             ) : (
-              "🚀 Sign Up Now"
+              <>Initiate Registration <ArrowRight size={20} /></>
             )}
           </button>
         </form>
 
-        <p className="text-center text-sm text-zinc-500 mt-8">
-          Already a member?{" "}
-          <Link href="/login" className="text-green-400 font-bold hover:text-green-300 transition-colors underline-offset-4 hover:underline">
-            Login here
+        <p className="text-center text-sm text-zinc-600 mt-8 md:mt-10 font-medium">
+          Already a regional member?{" "}
+          <Link href="/login" className="text-white font-black hover:text-accent transition-colors underline md:no-underline">
+            Authorize Proxy
           </Link>
         </p>
       </div>
-
-      <style jsx>{`
-        .pro-input {
-          width: 100%;
-          padding: 14px 18px;
-          border-radius: 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: white;
-          font-size: 15px;
-          transition: all 0.3s ease;
-        }
-        .pro-input:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.15);
-        }
-        .pro-input:focus {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: #22c55e;
-          box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
-          outline: none;
-        }
-        .pro-input::placeholder {
-          color: #52525b;
-        }
-      `}</style>
     </div>
   );
 };

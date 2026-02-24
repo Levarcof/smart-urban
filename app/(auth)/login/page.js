@@ -4,13 +4,13 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
+import { Sparkles, Mail, Lock, User as UserIcon, Building, ArrowRight, ShieldCheck } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
   const { setUser } = useUser();
 
   const [type, setType] = useState("user"); // user | department
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -34,160 +34,175 @@ const Page = () => {
       password: formData.password,
     };
 
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      alert("✅ Login successful!");
-      setUser(data.user);
-      if (type == "user") {
-        router.push("/");
+      if (res.ok) {
+        setUser(data.user);
+        if (type == "user") {
+          router.push("/");
+        } else {
+          router.push("/department");
+        }
       } else {
-        router.push("/department");
+        alert(data.message || "❌ Login failed");
       }
-    } else {
-      alert(data.message || "❌ Login failed");
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050505] relative overflow-hidden px-4">
-      {/* Dynamic Background Blobs for depth */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-900/20 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-green-600/10 rounded-full blur-[120px]" />
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-0 md:px-4">
+      {/* Background Orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[80%] md:w-[60%] h-[60%] bg-accent/10 rounded-full blur-[80px] md:blur-[120px]" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[80%] md:w-[60%] h-[60%] bg-accent-secondary/5 rounded-full blur-[80px] md:blur-[120px]" />
 
-      <div className="w-full max-w-5xl bg-[#0f0f0f]/80 backdrop-blur-2xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden flex flex-col md:flex-row animate-in fade-in zoom-in duration-500">
-        
-        {/* LEFT SECTION - Brand Identity */}
-        <div className="md:w-5/12 bg-gradient-to-br from-green-500 to-green-700 text-white flex flex-col items-center justify-center p-12 relative">
-          {/* Subtle pattern overlay */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none" 
-               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} 
-          />
-          
-          <div className="w-28 h-28 relative mb-8 drop-shadow-2xl">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              fill
-              className="object-contain"
-            />
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row glass-card overflow-hidden animate-in fade-in zoom-in duration-700 rounded-none md:rounded-[2.5rem] min-h-screen md:min-h-0 border-none md:border border-white/5">
+
+        {/* --- MOBILE LOGO (Hidden on Desktop) --- */}
+        <div className="lg:hidden flex items-center justify-between p-6 pt-12 relative z-10 w-full">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-lg">
+              <Sparkles size={20} className="text-white" />
+            </div>
+            <span className="text-white font-bold text-xl tracking-tight">SmartCivic</span>
+          </Link>
+          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-accent">
+            <ShieldCheck size={20} />
           </div>
-
-          <h1 className="text-4xl font-extrabold mb-4 tracking-tight text-center">
-            Smart Civic
-          </h1>
-          <div className="h-1 w-12 bg-white/40 rounded-full mb-6" />
-          <p className="text-center text-green-50 font-medium leading-relaxed opacity-90">
-            Next-gen traffic and waste management for modern urban ecosystems.
-          </p>
         </div>
 
-        {/* RIGHT SECTION - Form Controls */}
-        <div className="md:w-7/12 p-10 lg:p-16 flex flex-col justify-center bg-zinc-900/30">
-          <div className="mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-zinc-400 font-medium">Please enter your details to sign in.</p>
-          </div>
+        {/* SIDEBAR - Visual Brand (Desktop Only) */}
+        <div className="hidden lg:flex lg:w-[40%] bg-gradient-to-br from-accent to-accent-secondary p-12 flex-col justify-between relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 0L15 30M0 15L30 15' stroke='white' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")` }}
+          />
 
-          {/* TOGGLE BUTTONS - Modern Pill Style */}
-          <div className="flex bg-zinc-800/50 border border-white/5 rounded-2xl p-1.5 mb-8">
-            <button
-              onClick={() => setType("user")}
-              className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-                type === "user"
-                  ? "bg-green-500 text-black shadow-[0_4px_12px_rgba(34,197,94,0.3)]"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <span className="text-lg">👤</span> User
-            </button>
-            <button
-              onClick={() => setType("department")}
-              className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-                type === "department"
-                  ? "bg-green-500 text-black shadow-[0_4px_12px_rgba(34,197,94,0.3)]"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <span className="text-lg">🏢</span> Department
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="name@company.com"
-                className="pro-input"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="pro-input"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-4 mt-4 rounded-2xl bg-green-500 hover:bg-green-400 text-black font-black uppercase tracking-wider transition-all duration-300 transform hover:translate-y-[-2px] active:scale-95 shadow-[0_10px_20px_rgba(34,197,94,0.2)]"
-            >
-              Sign In
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-zinc-500 mt-8">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-green-400 font-bold hover:text-green-300 transition-colors underline-offset-4 hover:underline">
-              Create Account
+          <div className="relative z-10">
+            <Link href="/" className="flex items-center gap-3 mb-16 group">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
+                <Sparkles size={28} className="text-white" />
+              </div>
+              <span className="text-white font-bold text-2xl tracking-tight">SmartCivic</span>
             </Link>
-          </p>
+
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6">
+              Empowering <br />
+              <span className="text-white/70">Urban Living.</span>
+            </h1>
+            <p className="text-white/80 text-lg max-w-sm leading-relaxed">
+              Experience the next generation of smart city management with our AI-driven ecosystem.
+            </p>
+          </div>
+
+          <div className="relative z-10 pt-12">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
+              <div className="w-10 h-10 rounded-full bg-accent-secondary flex items-center justify-center text-white font-bold text-xl">
+                2k
+              </div>
+              <p className="text-sm text-white/90 font-medium">
+                Active citizens contributing to a smarter future today.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* LOGIN FORM */}
+        <div className="w-full lg:w-[60%] p-6 md:p-12 lg:p-20 flex flex-col justify-center bg-zinc-900/20 relative z-10">
+          <div className="max-w-md mx-auto w-full">
+            <div className="mb-8 md:mb-10 text-center lg:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 md:mb-3 tracking-tight">Welcome Back</h2>
+              <p className="text-zinc-500 font-medium text-base md:text-lg">Secure access to your smart dashboard.</p>
+            </div>
+
+            {/* SWITCHER */}
+            <div className="flex glass p-1 rounded-2xl mb-8 md:mb-10 shadow-inner">
+              <button
+                onClick={() => setType("user")}
+                className={`flex-1 py-3 md:py-3.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-500 flex items-center justify-center gap-2 ${type === "user"
+                  ? "bg-accent text-white shadow-lg shadow-accent/20"
+                  : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+              >
+                <UserIcon size={16} className="md:w-[18px]" /> Citizen
+              </button>
+              <button
+                onClick={() => setType("department")}
+                className={`flex-1 py-3 md:py-3.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-500 flex items-center justify-center gap-2 ${type === "department"
+                  ? "bg-accent text-white shadow-lg shadow-accent/20"
+                  : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+              >
+                <Building size={16} className="md:w-[18px]" /> Dept
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Identity Uplink</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 transition-colors group-focus-within:text-accent">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="name@nexus.com"
+                    className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-end mb-1">
+                  <label className="text-[10px] md:text-xs font-black text-white/30 uppercase tracking-[0.2em] ml-1">Access Protocol</label>
+                  <Link href="/forgot" className="text-accent text-[10px] md:text-xs font-bold hover:underline underline-offset-4 tracking-tight">Forgot Key?</Link>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-zinc-600 transition-colors group-focus-within:text-accent">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    className="w-full pl-14 pr-5 py-4 min-h-[52px] rounded-2xl bg-white/[0.03] border border-white/5 text-white placeholder:text-zinc-700 focus:outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all duration-300 font-medium text-sm md:text-base"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="premium-button w-full py-5 text-sm font-black tracking-[0.1em] uppercase flex items-center justify-center gap-3 mt-4 shadow-xl active:scale-95 transition-transform"
+              >
+                Initialize Session <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <div className="mt-10 md:mt-12 text-center pb-8 md:pb-0">
+              <p className="text-zinc-600 text-sm font-medium">
+                Not a member yet?{" "}
+                <Link href="/signup" className="text-white font-black hover:text-accent transition-colors underline md:no-underline">
+                  Create Account
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .pro-input {
-          width: 100%;
-          padding: 14px 18px;
-          border-radius: 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: white;
-          font-size: 15px;
-          transition: all 0.3s ease;
-        }
-        .pro-input:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.15);
-        }
-        .pro-input:focus {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: #22c55e;
-          box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
-          outline: none;
-        }
-        .pro-input::placeholder {
-          color: #52525b;
-        }
-      `}</style>
     </div>
   );
 };
