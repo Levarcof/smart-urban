@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata = {
   title: "SmartCivic | Urban Ecosystem Management",
   description: "Next-gen traffic and waste management for modern urban ecosystems.",
+   icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
