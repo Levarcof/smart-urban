@@ -14,8 +14,8 @@ export const metadata = {
    icons: {
     icon: "/icon.png",
   },
-    verification: {
-    google: "gXhsUixBKk8pOE9lWKm6NZ-_T0NQHbRH1ID-9Sg2bxU",
+  verification: {
+    google: "JagtDe9ZTdfjy9mJWmgr2P5nO3yB5ClF23rN2-bjO4c",
   },
 };
 
